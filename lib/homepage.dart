@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:snippet_coder_utils/FormHelper.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,7 +12,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<dynamic> countries = [];//1
+  //ce tableau sera remplir directement via l'api si on active l'api
+  List<dynamic> countries = [
+    {"id": 2, "name": "CI"},
+    {"id": 1, "name": "India"}
+  ];//1
   List<dynamic> stateMasters = [];//2
   List<dynamic> states = [];//2
 
@@ -18,10 +25,12 @@ class _HomePageState extends State<HomePage> {
 
   void initState(){
     super.initState();
+    fetchData();
 
-    this.countries.add({"id": 1, "name": "India"});
-    this.countries.add({"id": 2, "name": "CI"});
+    // this.countries.add({"id": 1, "name": "India"});
+    // this.countries.add({"id": 2, "name": "CI"});
 
+    //Cette partie est commentée lorsqu'on passe via une api
     this.stateMasters = [
       {"ID": 1, "Name": "Assam", "ParentId": 1},
       {"ID": 2, "Name": "Dehli", "ParentId": 1},
@@ -31,6 +40,22 @@ class _HomePageState extends State<HomePage> {
       {"ID": 2, "Name": "Bouaké", "ParentId": 2},
       {"ID": 3, "Name": "Yamoussoukro", "ParentId": 2},
     ];
+  }
+
+  //Methode de recuperation des données via l'api laravel
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse('https://votre-api-laravel.com/data'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      setState(() {
+        this.countries = data['countries'];
+        this.stateMasters = data['stateMasters'];
+      });
+    } else {
+      throw Exception('Erreur lors de la récupération des données depuis l\'API');
+    }
   }
 
   @override
