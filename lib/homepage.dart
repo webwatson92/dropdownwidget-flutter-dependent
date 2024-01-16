@@ -9,17 +9,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<dynamic> countries = [
-    {"id": 1, "label": "India"},
-    {"id": 2, "label": "CI"}
-  ];
-  String? countryId;
+  List<dynamic> countries = [];//1
+  List<dynamic> stateMasters = [];//2
+  List<dynamic> states = [];//2
+
+  String? countryId;//1
+  String? stateId;//2
 
   void initState(){
     super.initState();
 
-    // this.countries.add({"id": 1, "label": "India"});
-    // this.countries.add({"id": 2, "label": "CI"});
+    this.countries.add({"id": 1, "name": "India"});
+    this.countries.add({"id": 2, "name": "CI"});
+
+    this.stateMasters = [
+      {"ID": 1, "Name": "Assam", "ParentId": 1},
+      {"ID": 2, "Name": "Dehli", "ParentId": 1},
+      {"ID": 3, "Name": "Bihar", "ParentId": 1},
+      {"ID": 4, "Name": "Punjab", "ParentId": 1},
+      {"ID": 1, "Name": "Abidjan", "ParentId": 2},
+      {"ID": 2, "Name": "Bouaké", "ParentId": 2},
+      {"ID": 3, "Name": "Yamoussoukro", "ParentId": 2},
+    ];
   }
 
   @override
@@ -39,8 +50,17 @@ class _HomePageState extends State<HomePage> {
               this.countryId,
               this.countries,
               (onChangedVal){
-                this.countryId = onChangedVal;
-                print("country: $onChangedVal");
+                 setState(() {
+                  this.countryId = onChangedVal;
+                  print("country: $onChangedVal");
+
+                  this.states = this.stateMasters
+                      .where(
+                        (stateItem) => stateItem["ParentId"]
+                      .toString() == onChangedVal.toString(),
+                  ).toList();
+                  this.stateId = null;
+                });
               },
               (onValidatedVal){
                if(onValidatedVal == null){
@@ -52,7 +72,31 @@ class _HomePageState extends State<HomePage> {
               borderFocusColor: Theme.of(context).primaryColor,
               borderRadius: 10,
               optionValue: "id",
-              optionLabel: "label"
+              optionLabel: "name"
+            ),
+            FormHelper.dropDownWidgetWithLabel(
+              context, 
+              "Ville", 
+              "Selectionner la ville", 
+              this.stateId, 
+              this.states, 
+              (onChangedVal){
+                setState(() {
+                  this.stateId = onChangedVal;
+                  print("state: $onChangedVal");
+                });
+              }, 
+              (onValidatedVal){
+                if(onValidatedVal == null){
+                  return "Veuille selectionner la ville";
+               }
+               return null;
+              },
+              borderColor: Theme.of(context).primaryColor,
+              borderFocusColor: Theme.of(context).primaryColor,
+              borderRadius: 10,
+              optionValue: "ID",
+              optionLabel: "Name"
             )
           ],
         ),
